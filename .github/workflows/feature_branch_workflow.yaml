@@ -23,18 +23,19 @@ on:
 env:
   TRUNK_BRANCH: main
   FEATURE_BRANCH: feature/${{github.event.inputs.feature_branch}}
-  PR_EXIST: 'false'
-  PR_URL: ''
-  PR_HTML_URL: ''
 
 # Define jobs within the workflow
 jobs:
-  check_if_pr:
+  check_if_pr_exist:
     runs-on: ubuntu-latest
     name: Check If PR Exist For Branch
     if: github.event.inputs.feature_branch != ''
+    outputs:
+        prExists: ${{steps.getPRList.outputs.pr_exists}}
+        prURL: ${{steps.getPRList.outputs.pr_url}}
+        prNumber: ${{steps.getPRList.outputs.pr_number}}
+        prHTMLURL: ${{steps.getPRList.outputs.pr_html_url}}
     steps:
-
       - name: Get Pull Request
         id: getPRList
         uses: OmOmofonmwan/get-pr-number-based-off-branch-name@main
@@ -42,25 +43,18 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           repository: ACompleteNoobSmoke/${{github.event.repository.name}}
           branch_name: ${{env.FEATURE_BRANCH}}
-
-      - name: Update PR Environment Variables
-        if: steps.getPRList.outputs.pr_exists == 'true'
-        run: |
-          echo "PR_EXIST=true" >> $GITHUB_ENV
-          echo "PR_URL=${{steps.getPRList.outputs.pr_url}}" >> $GITHUB_ENV
-          echo "PR_HTML_URL=${{steps.getPRList.outputs.pr_html_url}}" >> $GITHUB_ENV
   
   start_action:
     runs-on: ubuntu-latest
     name: Start Action - feature/${{github.event.inputs.feature_branch}}
-    needs: check_if_pr
+    needs: check_if_pr_exist
     if: github.event.inputs.action == 'Start' 
 
     permissions: write-all
 
     steps:
       - name: If PR Exist
-        if: env.PR_EXIST == 'true'
+        if: needs.check_if_pr_exist.outputs.prExists == 'true'
         run: |
           echo "ERROR: Pull Request Already Exists For ${{env.FEATURE_BRANCH}}"
           exit 1
@@ -105,7 +99,6 @@ jobs:
           git push -u origin $FEATURE_BRANCH
 
       - name: Create PR 
-        if: env.PR_EXIST == 'false'
         run: |
           curl -L \
               -X POST \
@@ -119,14 +112,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Resume Action - feature/${{github.event.inputs.feature_branch}}
     if: github.event.inputs.action == 'Resume'
-    needs: check_if_pr
+    needs: check_if_pr_exist
     permissions:
       contents: write
       pull-requests: write
 
     steps:
       - name: If PR Does Not Exist
-        if: env.PR_EXIST == 'false'
+        if:  needs.check_if_pr_exist.outputs.prExists == 'false'
         run: |
           echo "ERROR: Pull Request Does Not Exist For ${{env.FEATURE_BRANCH}}"
           exit 1
@@ -185,14 +178,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Finish Action - feature/${{github.event.inputs.feature_branch}}
     if: github.event.inputs.action == 'Finish'
-    needs: check_if_pr
+    needs: check_if_pr_exist
     permissions:
       contents: write
       pull-requests: write
 
     steps:
       - name: If PR Does Not Exist
-        if: env.PR_EXIST == 'false'
+        if: needs.check_if_pr_exist.outputs.prExists == 'false'
         run: |
           echo "ERROR: Pull Request Does Not Exist For ${{env.FEATURE_BRANCH}}"
           exit 1
@@ -237,6 +230,7 @@ jobs:
 
   update_pull_request:
     needs: 
+      -  check_if_pr_exist
       -  resume_action
       -  finish_action
     runs-on: ubuntu-latest
@@ -248,18 +242,18 @@ jobs:
       - name: Print
         run: echo ${{toJson(github)}}
       - name: Update PR
-        if: steps.getPRList.outputs.pr_exists == 'true'
+        if: needs.check_if_pr_exist.outputs.prExists == 'true'
         run: |
           curl -L \
            -X PATCH \
            -H "Accept: application/vnd.github+json" \
            -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" \
            -H "X-GitHub-Api-Version: 2022-11-28" \
-           ${{steps.getPRList.outputs.pr_url}} \
+           ${{needs.check_if_pr_exist.outputs.prURL}} \
            -d '{"title":"Ready For Review - ${{env.FEATURE_BRANCH}}","body":"Ready For Review - ${{env.FEATURE_BRANCH}}","state":"open", "draft": "false"}'
 
       - name: Set PR To Ready
-        if: steps.getPRList.outputs.pr_exists == 'true'
-        run: gh pr ready ${{steps.getPRList.outputs.pr_html_url}}
+        if: needs.check_if_pr_exist.outputs.prExists == 'true'
+        run: gh pr ready ${{needs.check_if_pr_exist.outputs.prHTMLURL}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
