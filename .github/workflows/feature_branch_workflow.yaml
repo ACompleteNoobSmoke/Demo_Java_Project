@@ -40,7 +40,7 @@ jobs:
         uses: OmOmofonmwan/get-pr-number-based-off-branch-name@main
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
-          repository: ${{github.repository}}
+          repository: ACompleteNoobSmoke/${{github.event.repository.name}}
           branch_name: ${{env.FEATURE_BRANCH}}
 
       - name: Update PR Environment Variables
