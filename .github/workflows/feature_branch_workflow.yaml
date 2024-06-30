@@ -46,7 +46,7 @@ jobs:
   
   start_action:
     runs-on: ubuntu-latest
-    name: Start Action - feature/${{github.event.inputs.feature_branch}}
+    name: Start Action
     needs: check_if_pr_exist
     if: github.event.inputs.action == 'Start' 
 
@@ -110,7 +110,7 @@ jobs:
 
   resume_action:
     runs-on: ubuntu-latest
-    name: Resume Action - feature/${{github.event.inputs.feature_branch}}
+    name: Resume Action
     if: github.event.inputs.action == 'Resume'
     needs: check_if_pr_exist
     permissions:
@@ -164,19 +164,19 @@ jobs:
           git pull --all
           git push origin $FEATURE_BRANCH
 
-      - name: Run the Action
-        uses: devops-infra/action-pull-request@v0.5.5
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: ${{env.FEATURE_BRANCH}}
-          target_branch: ${{env.TRUNK_BRANCH}}
-          title: Draft - ${{env.FEATURE_BRANCH}}
-          body: "**Currently work in progress - ${{env.FEATURE_BRANCH}}**"
-          draft: true
+      - name: Set PR To Ready For Review
+        run: |
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{secrets.TOKEN}}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            ${{needs.check_if_pr_exist.outputs.prURL}} \
+            -d '{"title":"Ready For Review - ${{env.FEATURE_BRANCH}}","body":"Ready For Review - ${{env.FEATURE_BRANCH}}","state":"open", "draft": true}'
 
   finish_action:
     runs-on: ubuntu-latest
-    name: Finish Action - feature/${{github.event.inputs.feature_branch}}
+    name: Finish Action
     if: github.event.inputs.action == 'Finish'
     needs: check_if_pr_exist
     permissions:
@@ -237,33 +237,10 @@ jobs:
              -H "X-GitHub-Api-Version: 2022-11-28" \
              ${{needs.check_if_pr_exist.outputs.prURL}} \
              -d '{"title":"Ready For Review - ${{env.FEATURE_BRANCH}}","body":"Ready For Review - ${{env.FEATURE_BRANCH}}","state":"open", "draft": false}'
+
+      - name: Set PR To Ready
+        if: needs.check_if_pr_exist.outputs.prExists == 'true'
+        run: gh pr ready ${{needs.check_if_pr_exist.outputs.prHTMLURL}}
+        env:
+          GITHUB_TOKEN: ${{secrets.TOKEN}}
   
-#   update_pull_request:
-#     needs: 
-#       -  check_if_pr_exist
-#       -  resume_action
-#       -  finish_action
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: write
-#       pull-requests: write
-
-#     steps:
-#       - name: Print
-#         run: echo ${{toJson(github)}}
-#       - name: Update PR
-#         if: needs.check_if_pr_exist.outputs.prExists == 'true'
-#         run: |
-#           curl -L \
-#            -X PATCH \
-#            -H "Accept: application/vnd.github+json" \
-#            -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" \
-#            -H "X-GitHub-Api-Version: 2022-11-28" \
-#            ${{needs.check_if_pr_exist.outputs.prURL}} \
-#            -d '{"title":"Ready For Review - ${{env.FEATURE_BRANCH}}","body":"Ready For Review - ${{env.FEATURE_BRANCH}}","state":"open", "draft": "false"}'
-
-#       - name: Set PR To Ready
-#         if: needs.check_if_pr_exist.outputs.prExists == 'true'
-#         run: gh pr ready ${{needs.check_if_pr_exist.outputs.prHTMLURL}}
-#         env:
-#           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
