@@ -26,10 +26,7 @@ jobs:
        name: Get Input
        runs-on: ubuntu-latest
        steps:
-        - name: Print Input
-          run: |
-            echo ${{github.event.inputs.action}}
-            echo ${{github.event.inputs.release_version}}
-            echo ${{github.event.inputs.development_version}}
-        - name: Print Coolest Coder
-          run: echo ${{vars.COOLEST_CODER}}
+        - name: Checkout Codebase
+          uses: actions/checkout@v4.1.7
+        - name: Build Project
+          run: mvn clean install
