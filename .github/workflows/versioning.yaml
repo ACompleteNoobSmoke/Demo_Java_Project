@@ -1,0 +1,35 @@
+name: Release Versioning Workflow
+
+run-name: "Release Versioning Workflow"
+
+on:
+    workflow_dispatch:
+        inputs:
+            action:
+                type: choice
+                description: Version To Increment (If Custom. Please Input Release or Development Version Below) 
+                options:
+                    - Major
+                    - Minor
+                    - Patch
+                    - Custom
+                required: true
+            release_version:
+                type: string
+                description: Name of release. May follow SemVer (Major.Minor.Patch) format
+            development_version:
+                type: string
+                description: Name of next development version. Must follow SemVer + "-" + <TEXT> (Major.Minor.Patch-TEXT) format
+
+jobs:
+    get_input:
+       name: Get Input
+       runs-on: ubuntu-latest
+       steps:
+        - name: Print Input
+          run: |
+            echo ${{github.event.inputs.action}}
+            echo ${{github.event.inputs.release_version}}
+            echo ${{github.event.inputs.development_version}}
+        - name: Print Coolest Coder
+          run: echo ${{vars.COOLEST_CODER}}
