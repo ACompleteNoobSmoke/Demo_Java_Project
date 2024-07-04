@@ -114,8 +114,7 @@ jobs:
     call_release_workflow:
        needs: increment_version
        uses: ACompleteNoobSmoke/Demo_Java_Project/.github/workflows/reusable_workflow.yaml@main
-       permissions:
-        contents: write
+       permissions: write-all
        with:
         snapshot_version: ${{needs.increment_version.outputs.NEXT_SNAPSHOT_VERSION}}
         release_version: ${{needs.increment_version.outputs.RELEASE_VERSION}}
