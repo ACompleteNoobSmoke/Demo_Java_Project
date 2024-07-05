@@ -1,6 +1,6 @@
 name: Release Versioning Workflow
 
-run-name: "Release Versioning Workflow --${{github.event.inputs.action}}"
+run-name: "Release Versioning Workflow -- ${{github.event.inputs.action}}"
 
 on:
     workflow_dispatch:
