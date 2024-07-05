@@ -100,6 +100,11 @@ jobs:
           git pull origin main
           git push -u origin $FEATURE_BRANCH
 
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ACompleteNoobSmoke/${{github.event.repository.name}}
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
@@ -107,7 +112,7 @@ jobs:
           title: DRAFT -- ${{env.FEATURE_BRANCH}}
           body: Currently In Progress For ${{env.FEATURE_BRANCH}}
           branch: ${{env.FEATURE_BRANCH}}
-          base: ACompleteNoobSmoke:${{env.TRUNK_BRANCH}}
+          base: ${{env.TRUNK_BRANCH}}
           
 
 
