@@ -109,7 +109,7 @@ jobs:
           body: "Testing"
           user_name: '${{github.actor}}'
           user_email: '${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com'
-          source_folder: 
+          source_folder: "DEMO_JAVA_PROJECT"
           destination_repo: 'ACompleteNoobSmoke/${{github.event.repository.name}}'
           destination_base_branch: '${{env.FEATURE_BRANCH}}'
           destination_head_branch: '${{env.TRUNK_BRANCH}}'
