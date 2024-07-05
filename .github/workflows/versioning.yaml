@@ -1,4 +1,4 @@
-name: Release Versioning Workflow
+name: Release Versioning Workflows
 
 run-name: "Release Versioning Workflow -- ${{github.event.inputs.action}}"
 
