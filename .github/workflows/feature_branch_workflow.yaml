@@ -100,19 +100,14 @@ jobs:
           git pull origin main
           git push -u origin $FEATURE_BRANCH
 
-      - name: Create PR Actions
-        uses: MDRCNY/MDRCNY-Actions-CPR@v1.0.1
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.TOKEN}}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
         with:
-          title: "Uyi Testing"
-          body: "Testing"
-          user_name: '${{github.actor}}'
-          user_email: '${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com'
-          source_folder: "/home/runner/work/Demo_Java_Project/Demo_Java_Project"
-          destination_repo: 'ACompleteNoobSmoke/${{github.event.repository.name}}'
-          destination_base_branch: '${{env.TRUNK_BRANCH}}'
-          destination_head_branch: '${{env.FEATURE_BRANCH}}'
+          token: ${{secrets.GITHUB_TOKEN}}
+          title: DRAFT -- ${{env.FEATURE_BRANCH}}
+          body: Currently In Progress For ${{env.FEATURE_BRANCH}}
+          branch: ${{env.FEATURE_BRANCH}}
+          base: ACompleteNoobSmoke/${{github.event.repository.name}}
           
 
 
