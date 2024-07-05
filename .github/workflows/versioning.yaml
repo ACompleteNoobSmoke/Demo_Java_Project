@@ -31,12 +31,28 @@ jobs:
         runs-on: ubuntu-latest
         name: Get Custom Inputs
         if: github.event.inputs.action == 'Custom'
+        outputs:
+            SNAPSHOT_VERSION: ${{steps.setOutputs.outputs.SNAPSHOT_VERSION}}-SNAPSHOT
+            RELEASE_VERSION: ${{steps.setOutputs.outputs.RELEASE_VERSION}}
         steps:
             - name: Stops If Fields Are Empty
               if: env.DEVELOPMENT_VERSION_INPUT == '' && env.RELEASE_VERSION_INPUT == ''
               run: |
                 echo "Please Enter A Development Or Release Version"
                 exit 1
+            - name: Set Ouputs
+              id: setOutputs
+              run: |
+               echo "SNAPSHOT_VERSION=${{env.DEVELOPMENT_VERSION_INPUT}}" >> $GITHUB_OUTPUT
+               echo "RELEASE_VERSION=${{env.RELEASE_VERSION_INPUT}}" >> $GITHUB_OUTPUT
+
+    call_release_workflow_with_custom_inputs:
+       needs: get_custom_inputs
+       uses: ACompleteNoobSmoke/Demo_Java_Project/.github/workflows/reusable_workflow.yaml@main
+       permissions: write-all
+       with:
+        snapshot_version: ${{needs.get_custom_inputs.outputs.SNAPSHOT_VERSION}}
+        release_version: ${{needs.get_custom_inputs.outputs.RELEASE_VERSION}}
             
               
     get_major_minor_patch_inputs:
