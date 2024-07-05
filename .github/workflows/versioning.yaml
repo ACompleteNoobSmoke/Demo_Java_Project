@@ -112,7 +112,7 @@ jobs:
                 fi
             - name: Print Versions
               run: |
-               echo "Next Development Version: ${{steps.nextSnapshotVersion.outputs.NEXT_SNAPSHOT_VERSION}}}"
+               echo "Next Development Version: ${{steps.nextSnapshotVersion.outputs.NEXT_SNAPSHOT_VERSION}}"
                echo "Release Version: ${{needs.get_major_minor_patch_inputs.outputs.RELEASE_VERSION}}"
 
     call_release_workflow:
@@ -120,5 +120,5 @@ jobs:
        uses: ACompleteNoobSmoke/Demo_Java_Project/.github/workflows/reusable_workflow.yaml@main
        permissions: write-all
        with:
-        snapshot_version: ${{needs.increment_version.outputs.NEXT_SNAPSHOT_VERSION}}
+        snapshot_version: ${{needs.increment_version.outputs.NEXT_SNAPSHOT_VERSION}}-SNAPSHOT
         release_version: ${{needs.increment_version.outputs.RELEASE_VERSION}}
