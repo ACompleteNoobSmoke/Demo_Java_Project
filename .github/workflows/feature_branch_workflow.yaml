@@ -111,8 +111,8 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           title: DRAFT -- ${{env.FEATURE_BRANCH}}
           body: Currently In Progress For ${{env.FEATURE_BRANCH}}
-          branch: ${{github.actor}}:${{env.FEATURE_BRANCH}}
-          base: ${{env.TRUNK_BRANCH}}
+          branch: ${{env.TRUNK_BRANCH}}
+          base: ${{github.actor}}:${{env.FEATURE_BRANCH}}
           
 
 
