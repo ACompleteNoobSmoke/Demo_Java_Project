@@ -57,6 +57,7 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git pull -p
           git add .
           git commit -m 'Release ${{inputs.release_version}}'
           git tag -a ${{inputs.release_version}} -m '${{inputs.release_version}}' --force
