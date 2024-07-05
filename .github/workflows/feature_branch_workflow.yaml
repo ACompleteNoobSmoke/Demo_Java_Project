@@ -107,7 +107,7 @@ jobs:
           title: DRAFT -- ${{env.FEATURE_BRANCH}}
           body: Currently In Progress For ${{env.FEATURE_BRANCH}}
           branch: ${{env.FEATURE_BRANCH}}
-          base: ACompleteNoobSmoke/${{github.event.repository.name}}
+          base: ACompleteNoobSmoke:${{env.TRUNK_BRANCH}}
           
 
 
