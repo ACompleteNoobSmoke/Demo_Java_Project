@@ -110,6 +110,10 @@ jobs:
                 else
                  echo "NEXT_SNAPSHOT_VERSION=${{needs.get_major_minor_patch_inputs.outputs._MAJOR}}.${{needs.get_major_minor_patch_inputs.outputs._MINOR}}.${{env.NEW_VERSION_NUMBER}}" >> $GITHUB_OUTPUT
                 fi
+            - name: Print Versions
+              run: |
+               echo "Next Development Version: ${{env.NEXT_SNAPSHOT_VERSION}}"
+               echo "Release Version: ${{needs.get_major_minor_patch_inputs.outputs.RELEASE_VERSION}}"
 
     call_release_workflow:
        needs: increment_version
