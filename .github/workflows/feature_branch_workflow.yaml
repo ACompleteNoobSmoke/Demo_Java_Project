@@ -105,26 +105,26 @@ jobs:
         with:
           repository: ACompleteNoobSmoke/${{github.event.repository.name}}
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-          title: DRAFT -- ${{env.FEATURE_BRANCH}}
-          body: Currently In Progress For ${{env.FEATURE_BRANCH}}
-          branch: ${{env.TRUNK_BRANCH}}
-          base: ${{github.actor}}:${{env.FEATURE_BRANCH}}
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v6
+      #   with:
+      #     token: ${{secrets.GITHUB_TOKEN}}
+      #     title: DRAFT -- ${{env.FEATURE_BRANCH}}
+      #     body: Currently In Progress For ${{env.FEATURE_BRANCH}}
+      #     branch: ${{env.TRUNK_BRANCH}}
+      #     base: ${{github.actor}}:${{env.FEATURE_BRANCH}}
           
 
 
-      # - name: Create PR 
-      #   run: |
-      #     curl -L \
-      #         -X POST \
-      #         -H "Accept: application/vnd.github+json" \
-      #         -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" \
-      #         -H "X-GitHub-Api-Version: 2022-11-28" \
-      #        https://api.github.com/repos/ACompleteNoobSmoke/${{github.event.repository.name}}/pulls \
-      #     -d '{"title":"Draft - ${{env.FEATURE_BRANCH}}","body":"Currently In Progress: ${{env.FEATURE_BRANCH}}","head":"${{github.repository_owner}}:${{env.FEATURE_BRANCH}}","base":"${{env.TRUNK_BRANCH}}", "maintainer_can_modify": false, "draft": true}'
+      - name: Create PR 
+        run: |
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{secrets.TOKEN}}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+             https://api.github.com/repos/ACompleteNoobSmoke/${{github.event.repository.name}}/pulls \
+          -d '{"title":"Draft - ${{env.FEATURE_BRANCH}}","body":"Currently In Progress: ${{env.FEATURE_BRANCH}}","head":"${{github.repository_owner}}:${{env.FEATURE_BRANCH}}","base":"${{env.TRUNK_BRANCH}}", "maintainer_can_modify": false, "draft": true, "user":{"login": ${{github.actor}}} }'
 
   resume_action:
     runs-on: ubuntu-latest
